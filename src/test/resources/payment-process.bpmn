@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0plvod9" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.2.0">
+  <bpmn:process id="PaymentProcess" name="Payment Process" isExecutable="true">
+    <bpmn:sequenceFlow id="Flow_1b1ij2c" sourceRef="PaymentRequestedStartEvent" targetRef="Gateway_129xsxv" />
+    <bpmn:serviceTask id="ChargeCreditTask" name="Charge Credit" camunda:type="external" camunda:topic="credit-charging">
+      <bpmn:incoming>Flow_1iqiq4p</bpmn:incoming>
+      <bpmn:outgoing>Flow_0t6yx5l</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="IsCreditSufficientGateway" name="Is Credit Sufficient?">
+      <bpmn:incoming>Flow_0t6yx5l</bpmn:incoming>
+      <bpmn:outgoing>NoSequenceFlow</bpmn:outgoing>
+      <bpmn:outgoing>YesSequenceFlow</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0t6yx5l" sourceRef="ChargeCreditTask" targetRef="IsCreditSufficientGateway" />
+    <bpmn:sequenceFlow id="NoSequenceFlow" name="No" sourceRef="IsCreditSufficientGateway" targetRef="ChargeCreditCardTask">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${not creditSufficient}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="Gateway_1m1jyaw">
+      <bpmn:incoming>YesSequenceFlow</bpmn:incoming>
+      <bpmn:incoming>Flow_1hv4ltx</bpmn:incoming>
+      <bpmn:outgoing>Flow_0vtwunv</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="YesSequenceFlow" name="Yes" sourceRef="IsCreditSufficientGateway" targetRef="Gateway_1m1jyaw">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${creditSufficient}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1hv4ltx" sourceRef="ChargeCreditCardTask" targetRef="Gateway_1m1jyaw" />
+    <bpmn:sequenceFlow id="Flow_0vtwunv" sourceRef="Gateway_1m1jyaw" targetRef="PaymentDoneEndEvent" />
+    <bpmn:serviceTask id="ChargeCreditCardTask" name="Charge Credit Card" camunda:type="external" camunda:topic="credit-card-charging">
+      <bpmn:incoming>NoSequenceFlow</bpmn:incoming>
+      <bpmn:outgoing>Flow_1hv4ltx</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:startEvent id="PaymentRequestedStartEvent" name="Payment Requested">
+      <bpmn:outgoing>Flow_1b1ij2c</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0qq3h23" messageRef="Message_0n6sijt" />
+    </bpmn:startEvent>
+    <bpmn:boundaryEvent id="ChargeFailedBoundaryEvent" name="Charge Failed" attachedToRef="ChargeCreditCardTask">
+      <bpmn:outgoing>Flow_06gbb0m</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_0ywviir" errorRef="Error_1dbgvvs" camunda:errorMessageVariable="chargeErrorMessage" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_06gbb0m" sourceRef="ChargeFailedBoundaryEvent" targetRef="Event_1u989af" />
+    <bpmn:boundaryEvent id="Event_0rpvt4m" attachedToRef="ChargeCreditTask">
+      <bpmn:compensateEventDefinition id="CompensateEventDefinition_1g1mnvt" />
+    </bpmn:boundaryEvent>
+    <bpmn:serviceTask id="RefundCreditTask" name="Refund Credit" isForCompensation="true" camunda:type="external" camunda:topic="credit-refunding" />
+    <bpmn:sequenceFlow id="Flow_0do1zuq" sourceRef="Event_1u989af" targetRef="IsTheErrorResolvableGateway" />
+    <bpmn:intermediateThrowEvent id="Event_1u989af">
+      <bpmn:incoming>Flow_06gbb0m</bpmn:incoming>
+      <bpmn:outgoing>Flow_0do1zuq</bpmn:outgoing>
+      <bpmn:compensateEventDefinition id="CompensateEventDefinition_02t0ty0" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:exclusiveGateway id="IsTheErrorResolvableGateway" name="Is the error resolvable?">
+      <bpmn:incoming>Flow_0do1zuq</bpmn:incoming>
+      <bpmn:outgoing>NoSequenceFlow1</bpmn:outgoing>
+      <bpmn:outgoing>YesSequenceFlow1</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="NoSequenceFlow1" name="No" sourceRef="IsTheErrorResolvableGateway" targetRef="PaymentFailedEndEvent">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${not resolvable}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="YesSequenceFlow1" name="Yes" sourceRef="IsTheErrorResolvableGateway" targetRef="HandleErrorTask">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${resolvable}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="Gateway_129xsxv">
+      <bpmn:incoming>Flow_1b1ij2c</bpmn:incoming>
+      <bpmn:incoming>Flow_091vqxi</bpmn:incoming>
+      <bpmn:outgoing>Flow_1iqiq4p</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1iqiq4p" sourceRef="Gateway_129xsxv" targetRef="ChargeCreditTask" />
+    <bpmn:sequenceFlow id="Flow_091vqxi" sourceRef="HandleErrorTask" targetRef="Gateway_129xsxv" />
+    <bpmn:userTask id="HandleErrorTask" name="Handle Error" camunda:formKey="embedded:deployment:resolve-issue-form.html" camunda:candidateGroups="accounting">
+      <bpmn:incoming>YesSequenceFlow1</bpmn:incoming>
+      <bpmn:outgoing>Flow_091vqxi</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="PaymentDoneEndEvent" name="Payment Done">
+      <bpmn:extensionElements>
+        <camunda:executionListener event="start">
+          <camunda:script scriptFormat="javascript">execution.setVariable("paymentOK", true);</camunda:script>
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0vtwunv</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0rblbjq" camunda:type="external" camunda:topic="payment-finishing" />
+    </bpmn:endEvent>
+    <bpmn:endEvent id="PaymentFailedEndEvent" name="Payment Failed">
+      <bpmn:extensionElements>
+        <camunda:executionListener event="start">
+          <camunda:script scriptFormat="javascript">execution.setVariable("paymentOK", false);</camunda:script>
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+      <bpmn:incoming>NoSequenceFlow1</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0ncsdzs" camunda:type="external" camunda:topic="payment-finishing" />
+    </bpmn:endEvent>
+    <bpmn:association id="Association_1w9r617" associationDirection="One" sourceRef="Event_0rpvt4m" targetRef="RefundCreditTask" />
+  </bpmn:process>
+  <bpmn:message id="Message_0n6sijt" name="PaymentRequestedMessage" />
+  <bpmn:error id="Error_1oo1jzc" name="Charge Failed" errorCode="ChargeFailed" />
+  <bpmn:error id="Error_1dbgvvs" name="Charge Failed" errorCode="ChargeFailed" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="PaymentProcess">
+      <bpmndi:BPMNEdge id="Flow_091vqxi_di" bpmnElement="Flow_091vqxi">
+        <di:waypoint x="1040" y="620" />
+        <di:waypoint x="1040" y="650" />
+        <di:waypoint x="290" y="650" />
+        <di:waypoint x="290" y="165" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1iqiq4p_di" bpmnElement="Flow_1iqiq4p">
+        <di:waypoint x="315" y="140" />
+        <di:waypoint x="370" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1wkaa5z_di" bpmnElement="YesSequenceFlow1">
+        <di:waypoint x="890" y="455" />
+        <di:waypoint x="890" y="580" />
+        <di:waypoint x="990" y="580" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="896" y="551" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1t3kquf_di" bpmnElement="NoSequenceFlow1">
+        <di:waypoint x="915" y="430" />
+        <di:waypoint x="1022" y="430" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="961" y="412" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0do1zuq_di" bpmnElement="Flow_0do1zuq">
+        <di:waypoint x="808" y="430" />
+        <di:waypoint x="865" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06gbb0m_di" bpmnElement="Flow_06gbb0m">
+        <di:waypoint x="720" y="318" />
+        <di:waypoint x="720" y="430" />
+        <di:waypoint x="772" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0vtwunv_di" bpmnElement="Flow_0vtwunv">
+        <di:waypoint x="855" y="140" />
+        <di:waypoint x="1032" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1hv4ltx_di" bpmnElement="Flow_1hv4ltx">
+        <di:waypoint x="750" y="260" />
+        <di:waypoint x="830" y="260" />
+        <di:waypoint x="830" y="165" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1723ldf_di" bpmnElement="YesSequenceFlow">
+        <di:waypoint x="575" y="140" />
+        <di:waypoint x="805" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="681" y="122" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1r6xjf4_di" bpmnElement="NoSequenceFlow">
+        <di:waypoint x="550" y="165" />
+        <di:waypoint x="550" y="260" />
+        <di:waypoint x="650" y="260" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="558" y="233" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0t6yx5l_di" bpmnElement="Flow_0t6yx5l">
+        <di:waypoint x="470" y="140" />
+        <di:waypoint x="525" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1b1ij2c_di" bpmnElement="Flow_1b1ij2c">
+        <di:waypoint x="198" y="140" />
+        <di:waypoint x="265" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_07ed4wc_di" bpmnElement="ChargeCreditTask">
+        <dc:Bounds x="370" y="100" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0lcxkee_di" bpmnElement="IsCreditSufficientGateway" isMarkerVisible="true">
+        <dc:Bounds x="525" y="115" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="524" y="85" width="52" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1m1jyaw_di" bpmnElement="Gateway_1m1jyaw" isMarkerVisible="true">
+        <dc:Bounds x="805" y="115" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0gzwplj_di" bpmnElement="ChargeCreditCardTask">
+        <dc:Bounds x="650" y="220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0knzzj4_di" bpmnElement="PaymentRequestedStartEvent">
+        <dc:Bounds x="162" y="122" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="153" y="165" width="54" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0n1wf8v_di" bpmnElement="RefundCreditTask">
+        <dc:Bounds x="500" y="360" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_14rrfaf_di" bpmnElement="Event_1u989af">
+        <dc:Bounds x="772" y="412" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1lekhkq_di" bpmnElement="IsTheErrorResolvableGateway" isMarkerVisible="true">
+        <dc:Bounds x="865" y="405" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="861" y="368" width="57" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_129xsxv_di" bpmnElement="Gateway_129xsxv" isMarkerVisible="true">
+        <dc:Bounds x="265" y="115" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0softj1_di" bpmnElement="HandleErrorTask">
+        <dc:Bounds x="990" y="540" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0majv24_di" bpmnElement="PaymentFailedEndEvent">
+        <dc:Bounds x="1022" y="412" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1002" y="455" width="77" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0f1p43a_di" bpmnElement="PaymentDoneEndEvent">
+        <dc:Bounds x="1032" y="122" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1014" y="165" width="73" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1twxthd_di" bpmnElement="Event_0rpvt4m">
+        <dc:Bounds x="412" y="162" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0o7pyaa_di" bpmnElement="ChargeFailedBoundaryEvent">
+        <dc:Bounds x="702" y="282" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="745" y="303" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1w9r617_di" bpmnElement="Association_1w9r617">
+        <di:waypoint x="430" y="198" />
+        <di:waypoint x="430" y="400" />
+        <di:waypoint x="500" y="400" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

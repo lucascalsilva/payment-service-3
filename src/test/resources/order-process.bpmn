@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_19cs7hu" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.2.0">
+  <bpmn:process id="OrderProcess" name="Order Process" isExecutable="true">
+    <bpmn:startEvent id="OrderPlacedStartEvent" name="Order Placed">
+      <bpmn:outgoing>Flow_0dtvhq5</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1pqxxmk" messageRef="Message_1q1mxqo" />
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0dtvhq5" sourceRef="OrderPlacedStartEvent" targetRef="SetBusinessKeyTask" />
+    <bpmn:sendTask id="SendPaymentRequestTask" name="Send Payment Request" camunda:type="external" camunda:topic="payment-requesting">
+      <bpmn:incoming>Flow_1bfbx3r</bpmn:incoming>
+      <bpmn:outgoing>Flow_0vgr1dg</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:sequenceFlow id="Flow_0vgr1dg" sourceRef="SendPaymentRequestTask" targetRef="ReceivePaymentTask" />
+    <bpmn:receiveTask id="ReceivePaymentTask" name="Receive Payment" messageRef="Message_11kaio6">
+      <bpmn:incoming>Flow_0vgr1dg</bpmn:incoming>
+      <bpmn:outgoing>Flow_0zklrb5</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:sequenceFlow id="Flow_0zklrb5" sourceRef="ReceivePaymentTask" targetRef="FetchGoodsTask" />
+    <bpmn:scriptTask id="FetchGoodsTask" name="Fetch Goods" scriptFormat="javascript">
+      <bpmn:incoming>Flow_0zklrb5</bpmn:incoming>
+      <bpmn:outgoing>Flow_0y132jr</bpmn:outgoing>
+      <bpmn:script>print("Fetch Goods");</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_0y132jr" sourceRef="FetchGoodsTask" targetRef="ShipGoodsTask" />
+    <bpmn:scriptTask id="ShipGoodsTask" name="Ship Goods" scriptFormat="javascript">
+      <bpmn:incoming>Flow_0y132jr</bpmn:incoming>
+      <bpmn:outgoing>Flow_0t63ovk</bpmn:outgoing>
+      <bpmn:script>print("Fetch Goods");</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="Event_16gyk51">
+      <bpmn:incoming>Flow_0t63ovk</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0t63ovk" sourceRef="ShipGoodsTask" targetRef="Event_16gyk51" />
+    <bpmn:sequenceFlow id="Flow_1bfbx3r" sourceRef="SetBusinessKeyTask" targetRef="SendPaymentRequestTask" />
+    <bpmn:scriptTask id="SetBusinessKeyTask" name="Set Business Key" scriptFormat="javascript">
+      <bpmn:incoming>Flow_0dtvhq5</bpmn:incoming>
+      <bpmn:outgoing>Flow_1bfbx3r</bpmn:outgoing>
+      <bpmn:script>execution.setBusinessKey(java.util.UUID.randomUUID().toString());</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmn:message id="Message_1q1mxqo" name="OrderPlacedMessage" />
+  <bpmn:message id="Message_11kaio6" name="ReceivePaymentMessage" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="OrderProcess">
+      <bpmndi:BPMNEdge id="Flow_0t63ovk_di" bpmnElement="Flow_0t63ovk">
+        <di:waypoint x="990" y="120" />
+        <di:waypoint x="1052" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0y132jr_di" bpmnElement="Flow_0y132jr">
+        <di:waypoint x="830" y="120" />
+        <di:waypoint x="890" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0zklrb5_di" bpmnElement="Flow_0zklrb5">
+        <di:waypoint x="670" y="120" />
+        <di:waypoint x="730" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0vgr1dg_di" bpmnElement="Flow_0vgr1dg">
+        <di:waypoint x="510" y="120" />
+        <di:waypoint x="570" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dtvhq5_di" bpmnElement="Flow_0dtvhq5">
+        <di:waypoint x="215" y="120" />
+        <di:waypoint x="260" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1bfbx3r_di" bpmnElement="Flow_1bfbx3r">
+        <di:waypoint x="360" y="120" />
+        <di:waypoint x="410" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_02zpqge_di" bpmnElement="OrderPlacedStartEvent">
+        <dc:Bounds x="179" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="165" y="145" width="65" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_01mqwid_di" bpmnElement="SendPaymentRequestTask">
+        <dc:Bounds x="410" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1f1rw4l_di" bpmnElement="ReceivePaymentTask">
+        <dc:Bounds x="570" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1egzw9s_di" bpmnElement="FetchGoodsTask">
+        <dc:Bounds x="730" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_06qum5q_di" bpmnElement="ShipGoodsTask">
+        <dc:Bounds x="890" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_16gyk51_di" bpmnElement="Event_16gyk51">
+        <dc:Bounds x="1052" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0dt5zjs_di" bpmnElement="SetBusinessKeyTask">
+        <dc:Bounds x="260" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
