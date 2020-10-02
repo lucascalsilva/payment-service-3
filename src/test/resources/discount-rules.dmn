@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="Definitions_14j9duc" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.2.0">
+  <decision id="DiscountRule" name="Discount Rule">
+    <decisionTable id="DecisionTable_1shnu7t">
+      <input id="Input_1" label="Amount" camunda:inputVariable="amount">
+        <inputExpression id="InputExpression_1" typeRef="double">
+          <text>amount</text>
+        </inputExpression>
+      </input>
+      <output id="Output_1" label="Discount" name="discount" typeRef="integer" />
+      <rule id="DecisionRule_1jod96w">
+        <inputEntry id="UnaryTests_1hzgm2y">
+          <text>&lt;= 39.99</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1a7ozm5">
+          <text>0</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1qhs3fk">
+        <inputEntry id="UnaryTests_102lxp9">
+          <text>[40.0..59.99]</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_00xoxye">
+          <text>2</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0njeg2b">
+        <inputEntry id="UnaryTests_0f0d609">
+          <text>[60.0..99.99]</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0xn0y0o">
+          <text>5</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_00c7fws">
+        <inputEntry id="UnaryTests_1h9tgw7">
+          <text>&gt;= 100.00</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1wcwuml">
+          <text>10</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="DiscountRule">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

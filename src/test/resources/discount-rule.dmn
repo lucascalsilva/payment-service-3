@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="Definitions_0abwsq4" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.2.0">
+  <decision id="DiscountRule" name="Discount Rule">
+    <decisionTable id="DecisionTable_0he2kdp">
+      <input id="Input_1" label="Amount" camunda:inputVariable="amount">
+        <inputExpression id="InputExpression_1" typeRef="double">
+          <text>amount</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_00lbyhe" label="Service Type" camunda:inputVariable="serviceType">
+        <inputExpression id="LiteralExpression_1q085ow" typeRef="string">
+          <text>serviceType</text>
+        </inputExpression>
+      </input>
+      <output id="Output_1" label="Discount" name="discount" typeRef="integer" />
+      <output id="OutputClause_0ixu9wf" label="Discount Description" name="discountDescription" typeRef="string" />
+      <rule id="DecisionRule_17ddwhf">
+        <inputEntry id="UnaryTests_0zbtbvg">
+          <text>&lt;100</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0tmlgfp">
+          <text>"BASIC"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1oqvxnk">
+          <text>0</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0otcrpg">
+          <text>"NO_DISCOUNT"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_087bte3">
+        <inputEntry id="UnaryTests_1gnq0zp">
+          <text>&lt;100</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0exxrv9">
+          <text>"PREMIUM"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_14kegbj">
+          <text>1</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1p6vobh">
+          <text>"SMALL_DISCOUNT"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0tn2ydy">
+        <inputEntry id="UnaryTests_0aom3pb">
+          <text>[100..1000]</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1q24aze">
+          <text>"BASIC"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0s4sdk9">
+          <text>2</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_09jii1m">
+          <text>"SMALL_DISCOUNT"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0b7x697">
+        <inputEntry id="UnaryTests_0yrlc8b">
+          <text>[100..1000]</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_11j6lwr">
+          <text>"PREMIUM"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1253a6c">
+          <text>3</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1l6evm5">
+          <text>"SMALL_DISCOUNT"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0q03hu8">
+        <inputEntry id="UnaryTests_1nsp6qy">
+          <text>]1000..2000]</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_05wi64h">
+          <text>"BASIC"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1wx099f">
+          <text>4</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0yj2fxj">
+          <text>"AVERAGE_DISCOUNT"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1a4lvpk">
+        <inputEntry id="UnaryTests_1kcsv27">
+          <text>]1000..2000]</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1uc459e">
+          <text>"PREMIUM"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1v7yzdr">
+          <text>5</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1pjc9on">
+          <text>"AVERAGE_DISCOUNT"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_166obbp">
+        <inputEntry id="UnaryTests_1m29sow">
+          <text>&gt;2000</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_04p6s7y">
+          <text>"BASIC"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1vmubed">
+          <text>6</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0shpuev">
+          <text>"HIGH_DISCOUNT"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0ukyno0">
+        <inputEntry id="UnaryTests_0myuata">
+          <text>&gt;2000</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_12yr5pf">
+          <text>"PREMIUM"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0n4f9wz">
+          <text>7</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0kc9npj">
+          <text>"HIGH_DISCOUNT"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="DiscountRule">
+        <dc:Bounds height="80" width="180" x="160" y="80" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>
